@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSW Crime Dashboard - Community Resource Centre</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">NSW Crime Dashboard</h1>
+                <p class="dashboard-subtitle">Community Resource Centre - Interactive Crime Analytics</p>
+            </div>
+            <div class="header-meta">
+                <span id="data-status" class="status-badge loading">Loading data...</span>
+                <span id="last-updated" class="last-updated"></span>
+            </div>
+        </header>
+
+        <div class="filters-panel">
+            <div class="filter-group">
+                <label for="year-filter">Year</label>
+                <select id="year-filter" class="filter-select">
+                    <option value="all">All Years</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="month-filter">Month</label>
+                <select id="month-filter" class="filter-select">
+                    <option value="all">All Months</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="area-filter">NSW Statistical Area</label>
+                <select id="area-filter" class="filter-select">
+                    <option value="all">All Areas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="category-filter">Offence Category</label>
+                <select id="category-filter" class="filter-select">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="subcategory-filter">Offence Subcategory</label>
+                <select id="subcategory-filter" class="filter-select">
+                    <option value="all">All Subcategories</option>
+                </select>
+            </div>
+            <button id="reset-filters" class="reset-btn">Reset Filters</button>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-value" id="kpi-total-incidents">0</span>
+                    <span class="kpi-label">Total Incidents</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-value" id="kpi-top-category">-</span>
+                    <span class="kpi-label">Most Common Offence</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-value" id="kpi-top-area">-</span>
+                    <span class="kpi-label">Highest Incident Area</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <div class="kpi-content">
+                    <span class="kpi-value" id="kpi-latest-month">-</span>
+                    <span class="kpi-label">Latest Reporting Month</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container large">
+                <div class="chart-header">
+                    <h2>Crime Incidents Over Time</h2>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-view="line">Line</button>
+                        <button class="chart-btn" data-view="area">Area</button>
+                    </div>
+                </div>
+                <canvas id="chart-time"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Incidents by Offence Category</h2>
+                </div>
+                <canvas id="chart-category"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Incidents by Geographic Area</h2>
+                </div>
+                <canvas id="chart-area"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Top Areas by Incident Count</h2>
+                </div>
+                <canvas id="chart-top-areas"></canvas>
+            </div>
+        </div>
+
+        <div class="rankings-panel">
+            <div class="ranking-card">
+                <h3>Top 10 Offence Categories</h3>
+                <div id="ranking-categories" class="ranking-list"></div>
+            </div>
+            <div class="ranking-card">
+                <h3>Top 10 Areas</h3>
+                <div id="ranking-areas" class="ranking-list"></div>
+            </div>
+            <div class="ranking-card">
+                <h3>Top 10 Subcategories</h3>
+                <div id="ranking-subcategories" class="ranking-list"></div>
+            </div>
+        </div>
+
+        <footer class="dashboard-footer">
+            <p>Data Source: NSW Bureau of Crime Statistics and Research (BOCSAR)</p>
+            <p>Updated automatically from published Google Sheets</p>
+        </footer>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading crime data...</p>
+    </div>
+
+    <div id="error-overlay" class="error-overlay hidden">
+        <div class="error-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h3>Failed to Load Data</h3>
+            <p id="error-message">Unable to fetch crime data from the source.</p>
+            <button id="retry-btn" class="retry-btn">Retry</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
